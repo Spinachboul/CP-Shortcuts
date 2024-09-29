@@ -1,0 +1,125 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+// Arrays to store input, positions, count of occurrences, and visited status.
+int a[300001], cnt[300001], pos[300001];
+bool vis[300001];
+
+// Vector to store the indices of the numbers.
+vector<int> test[300001];
+
+// Function to solve each test case
+void solve() {
+    int n, pt = 1e9;  // `pt` is initialized to a very large number.
+    cin >> n;
+
+    // Initialize the arrays and vectors for the current test case.
+    for (int i = 1; i <= n; ++i) {
+        cin >> a[i];       // Input the array
+        pos[i] = -1;       // Reset position
+        cnt[i] = 0;        // Reset count of occurrences
+        vis[i] = false;    // Reset visited status
+        test[i].clear();   // Clear the test vector
+    }
+
+    // Record positions and store indices for each value in the array.
+    for (int i = 1; i <= n; ++i) {
+        pos[a[i]] = i;
+        test[a[i]].push_back(i);
+    }
+
+    // Calculate the count of occurrences and find the minimum valid position (`pt`).
+    for (int i = 1; i <= n; ++i) {
+        if (pos[i] != -1) {
+            cnt[pos[i]]++;
+            pt = min(pt, pos[i]);  // Find the minimum position.
+        }
+    }
+
+    vector<int> res;  // Vector to store the result sequence.
+
+    // Start constructing the result sequence.
+    for (int i = 1; i <= n;) {
+        // If the current index `i` equals the minimum position `pt`.
+        if (i == pt) {
+            res.push_back(a[i]);  // Add the element to the result.
+            cnt[pos[a[i]]]--;     // Decrease the count of occurrences.
+            
+            // Update `pt` to find the next valid minimum position.
+            while (cnt[pt] == 0 && pt <= n) pt++;
+            i++;
+        } 
+        else {
+            // If the result size is even, we want to maximize the next element.
+            if (res.size() % 2 == 0) {
+                int max_ = 0;
+
+                // Find the maximum element in the range from `i` to `pt`.
+                for (int j = i; j <= min(pt, n); ++j) {
+                    if (!vis[j]) max_ = max(max_, a[j]);
+                }
+
+                // Add the maximum element to the result and move the index.
+                for (int j = i; j <= min(pt, n); ++j) {
+                    if (a[j] == max_) {
+                        i = j + 1;
+                        break;
+                    }
+                }
+
+                if (max_ == 0) break;  // If no maximum is found, break out of the loop.
+                res.push_back(max_);   // Add the maximum element to the result.
+                cnt[pos[max_]]--;      // Decrease the count for this element.
+                
+                // Update `pt` to find the next valid minimum position.
+                while (cnt[pt] == 0 && pt <= n) pt++;
+            } 
+            else {  // If the result size is odd, we want to minimize the next element.
+                int min_ = 1e9;
+
+                // Find the minimum element in the range from `i` to `pt`.
+                for (int j = i; j <= min(pt, n); ++j) {
+                    if (!vis[j]) min_ = min(min_, a[j]);
+                }
+
+                // Add the minimum element to the result and move the index.
+                for (int j = i; j <= min(pt, n); ++j) {
+                    if (a[j] == min_) {
+                        i = j + 1;
+                        break;
+                    }
+                }
+
+                if (min_ == 1e9) break;  // If no minimum is found, break out of the loop.
+                res.push_back(min_);     // Add the minimum element to the result.
+                cnt[pos[min_]]--;        // Decrease the count for this element.
+
+                // Update `pt` to find the next valid minimum position.
+                while (cnt[pt] == 0 && pt <= n) pt++;
+            }
+        }
+
+        // Mark the positions of the last element in `res` as visited.
+        for (int i : test[res.back()]) vis[i] = true;
+    }
+
+    // Output the result
+    cout << res.size() << endl;
+    for (int i : res) {
+        cout << i << ' ';
+    }
+    cout << endl;
+}
+
+// Main function to read multiple test cases.
+signed main() {
+    cin.tie(0);
+    cout.tie(0);
+    ios_base::sync_with_stdio(0);
+
+    int T = 1;
+    cin >> T;
+    while (T--) solve();
+
+    return 0;
+}

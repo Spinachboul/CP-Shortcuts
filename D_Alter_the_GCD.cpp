@@ -1,0 +1,182 @@
+/*-----AUTHOR--------
+-------FREEBIE-------
+https://codeforces.com/profile/freebie
+*/
+
+# include <bits/stdc++.h>
+using namespace std;
+
+# define ll long long
+# define pb push_back
+# define mp make_pair
+# define ff first
+# define ss second
+# define mod 1000000007
+# define INF 1e18
+# define vi vector<int>
+# define vll vector<ll>
+# define pii pair<int, int>
+# define pll pair<ll, ll>
+# define vvi vector<vi>
+# define vpii vector<pii>
+# define vpll vector<pll>
+# define all(x) x.begin(), x.end()
+# define endl "\n"
+# define forn(i, n) for(int i = 0; i < n; i++)
+# define fast ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+
+bool isPrime(int n){
+    if(n == 1){
+        return false;
+    }
+    for(int i = 2; i*i <= n; i++){
+        if(n%i == 0){
+            return false;
+        }
+    }
+    return true;
+}
+
+int gcd(int a, int b){
+    if(b == 0){
+        return a;
+    }
+    return gcd(b, a%b);
+}
+
+int lcm(int a, int b){
+    return (a*b)/gcd(a, b);
+}
+
+int power(int x, int y){
+    int res = 1;
+    while(y > 0){
+        if(y%2 == 1){
+            res = res*x;
+        }
+        x = x*x;
+        y = y/2;
+    }
+    return res;
+}
+
+int modInverse(int a, int m){
+    int m0 = m;
+    int y = 0, x = 1;
+    if(m == 1){
+        return 0;
+    }
+    while(a > 1){
+        int q = a/m;
+        int t = m;
+        m = a%m;
+        a = t;
+        t = y;
+        y = x - q*y;
+        x = t;
+    }
+    if(x < 0){
+        x = x + m0;
+    }
+    return x;
+}
+
+int modExpo(int x, int y, int p){
+    int res = 1;
+    x = x%p;
+    if(x == 0){
+        return 0;
+    }
+    while(y > 0){
+        if(y%2 == 1){
+            res = (res*x)%p;
+        }
+        y = y/2;
+        x = (x*x)%p;
+    }
+    return res;
+}
+
+
+
+void sieve(int n){
+    bool prime[n+1];
+    memset(prime, true, sizeof(prime));
+    for(int p = 2; p*p <= n; p++){
+        if(prime[p] == true){
+            for(int i = p*p; i <= n; i += p){
+                prime[i] = false;
+            }
+        }
+    }
+}   
+
+
+
+int gcd_of_array(const vector<int>& arr) {
+    return accumulate(arr.begin(), arr.end(), 0, gcd);
+}
+
+void solve(){
+    int n;
+    cin >> n;
+    vi a(n), b(n);
+    for(auto& x: a) cin >> x;
+    for(auto& x: b) cin >> x;
+
+
+    vi prefixA(n+1, 0);
+    vi prefixB(n+1, 0);
+    vi suffixA(n+1, 0);
+    vi suffixB(n+1, 0);
+
+    for(int i = 1; i <= n; i++){
+        prefixA[i] = gcd(prefixA[i-1], a[i-1]);
+        prefixB[i] = gcd(prefixB[i-1], b[i-1]);
+    }
+
+    for(int i=n-2 ; i>=0 ; i--){
+        suffixA[i] = gcd(suffixA[i+1], a[i]);
+        suffixB[i] = gcd(suffixB[i+1], b[i]);
+    }
+
+    int gcdA = (gcd_of_array(a));
+    int gcdB = (gcd_of_array(b));
+
+    ll mxS = gcd(gcdA ,gcdB);
+    ll pairs = 0;
+
+    for(int l=1 ; l<=n ; l++){
+        for(int j=l ; j<=n ; j++){
+            int afterswapA = gcd(prefixA[l-1], suffixA[j]);
+            int afterswapB = gcd(prefixB[l-1], suffixB[j]);
+            ll newS = gcd(afterswapB,afterswapA);
+
+            if(newS > mxS){
+                mxS = newS;
+                pairs = 1;
+            }
+            else if(newS == mxS){
+                pairs++;
+            }
+        }
+    }
+
+    cout << mxS <<  " " << pairs << endl;
+
+
+
+
+
+    
+}
+
+int main(){
+    fast;
+    int t;
+    t = 1;
+    cin >> t;
+    while(t--){
+        solve();
+    }
+}
